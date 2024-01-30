@@ -1,0 +1,50 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+</head>
+<body>
+    <h1>Weather Information</h1>
+    <form id="weather-form">
+        <input type="text" id="city" placeholder="Enter City" required>
+        <button type="submit">Get Weather</button>
+    </form>
+    <div id="weather-result"></div>
+
+    <script>
+        document.getElementById('weather-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var city = document.getElementById('city').value;
+            if (city) { // Check if the city is not empty
+                fetch(`/weather?city=${encodeURIComponent(city)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if(data.weather) {
+                            var weather = data.weather;
+                            document.getElementById('weather-result').innerHTML = `
+                                <h2>${weather.location.name}</h2>
+                                <p>Temperature: ${weather.current.temp_c}°C</p>
+                                <p>Condition: ${weather.current.condition.text}</p>
+                            `;
+                        } else {
+                            document.getElementById('weather-result').textContent = 'Weather data not available.';
+                        }
+                    })
+                    .catch(error => {
+                        document.getElementById('weather-result').textContent = 'Error fetching weather data.';
+                    });
+            } else {
+                document.getElementById('weather-result').textContent = 'Please enter a city.';
+            }
+        });
+    </script>
+</body>
+</html>
